@@ -1,0 +1,53 @@
+<html>
+    <body>
+        <h1>Canvas Examples</h1>
+        <hr>
+        <a href="/static/examples.html">(examples)</a>
+        <hr>
+        <canvas id="canvas1" width="200" height="100" style="border:1px solid #000000;">
+            <script>
+                var c = document.getElementById("canvas1");
+                var ctx = c.getContext("2d");
+                ctx.moveTo(0, 0);
+                ctx.stroke();
+            </script>
+        </canvas>
+        <hr>
+        <canvas id="canvas2" width="200" height="100" style="border:1px solid #000000;">
+            <script>
+                var c = document.getElementById("canvas2");
+                var ctx = c.getContext("2d");
+                ctx.moveTo(0, 0);
+                ctx.lineTo(200, 100);
+                ctx.stroke();
+            </script>
+        </canvas>
+        <hr>
+        <canvas id="canvas3" width="200" height="100" style="border:1px solid #000000;">
+            <script>
+                var c = document.getElementById("canvas3");
+                var ctx = c.getContext("2d");
+                ctx.moveTo(0, 0);
+                ctx.lineTo(200, 100);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(95, 50, 40, 0, 2 * Math.PI);
+                ctx.stroke();
+            </script>
+        </canvas>
+        <hr>
+        <canvas id="canvas4" width="200" height="100" style="border:1px solid #000000;">
+            <script>
+                var c = document.getElementById("canvas4");
+                var ctx = c.getContext("2d");
+                ctx.stroke();
+                ctx.font = "30px Arial";
+                ctx.strokeText("Hello World", 10, 30);
+                ctx.fillText("Hello World", 20, 60);
+                ctx.fillStyle = "#0000FF";
+                ctx.fillText("Hello World", 30, 90);
+            </script>
+        </canvas>
+        <hr>
+    </body>
+</html>
