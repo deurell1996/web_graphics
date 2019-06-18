@@ -1,0 +1,258 @@
+<html>
+    <body>
+        <h1>Canvas Examples</h1>
+        <hr>
+        <a href="/static/examples.html">(examples)</a>
+        <hr>
+        <canvas id="canvas1" width="150" height="150" style="border:1px solid #000000;">
+            <script>
+                var ctx = document.getElementById("canvas1").getContext("2d");
+
+                // Draw background
+                ctx.fillStyle = "rgb(255, 221, 0)";
+                ctx.fillRect(0, 0, 150, 37.5);
+                ctx.fillStyle = "rgb(102, 204, 0)";
+                ctx.fillRect(0, 37.5, 150, 37.5);
+                ctx.fillStyle = "rgb(0, 153, 255)";
+                ctx.fillRect(0, 75, 150, 37.5);
+                ctx.fillStyle = "rgb(255, 51, 0)";
+                ctx.fillRect(0, 112.5, 150, 37.5);
+
+                // Draw semi transparent rectangles
+                for (var i = 0; i < 10; i++) {
+                    ctx.fillStyle = "rgba(255, 255, 255, " + (i + 1) / 10 + ")";
+                    for (var j = 0; j < 4; j++) {
+                        ctx.fillRect(5 + i * 14, 5 + j * 37.5, 14, 27.5);
+                    }
+                }
+            </script>
+        </canvas>
+        <hr>
+        <canvas id="canvas2" width="150" height="150" style="border:1px solid #000000;">
+            <script>
+                var ctx = document.getElementById("canvas2").getContext("2d");
+                
+                // Clear canvas
+                ctx.clearRect(0, 0, 150, 150);
+
+                // Draw guides
+                ctx.strokeStyle = "#0099FF";
+                ctx.lineWidth   = 2;
+                ctx.strokeRect(-5, 50, 160, 50);
+
+                // Set line styles
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 10;
+
+                // Set the miter
+                ctx.miterLimit = 7;
+
+                // Draw lines
+                ctx.beginPath();
+                ctx.moveTo(0, 100);
+                for (i = 0; i < 24 ; i++) {
+                    var dy = i % 2 == 0 ? 25 : -25;
+                    ctx.lineTo(Math.pow(i, 1.5) * 2, 75 + dy);
+                }
+                ctx.stroke();
+            </script>
+        </canvas>
+        <hr>
+        <canvas id="canvas3" width="200" height="250" style="border:1px solid #000000;">
+            <script>
+                var ctx = document.getElementById("canvas3").getContext("2d");
+
+                var sin = Math.sin(Math.PI / 6);
+                var cos = Math.cos(Math.PI / 6);
+                ctx.translate(100, 100);
+                var c = 0;
+                for (var i = 0; i <= 12; i++) {
+                    c = Math.floor(255 / 12 * i);
+                    ctx.fillStyle = "rgb(" + c + ", " + c + ", " + c + ")";
+                    ctx.fillRect(0, 0, 100, 10);
+                    ctx.transform(cos, sin, -sin, cos, 0, 0);
+                }
+  
+                ctx.setTransform(-1, 0, 0, 1, 100, 100);
+                ctx.fillStyle = "rgba(255, 128, 255, 0.5)";
+                ctx.fillRect(0, 50, 100, 100);
+            </script>
+        </canvas>
+        <hr>
+        <canvas id="canvas4" width="150" height="150" style="border:1px solid #000000;">
+            <script>
+                var ctx = document.getElementById("canvas4").getContext("2d");
+                ctx.fillRect(0, 0, 150, 150);
+                ctx.translate(75, 75);
+
+                // Create a circular clipping path
+                ctx.beginPath();
+                ctx.arc(0, 0, 60, 0, Math.PI * 2, true);
+                ctx.clip();
+
+                // Draw background
+                var lingrad = ctx.createLinearGradient(0, -75, 0, 75);
+                lingrad.addColorStop(0, "#232256");
+                lingrad.addColorStop(1, "#143778");
+                
+                ctx.fillStyle = lingrad;
+                ctx.fillRect(-75, -75, 150, 150);
+
+                // Draw stars
+                for (var j = 1; j < 50; j++) {
+                    ctx.save();
+                    ctx.fillStyle = "#FFFFFF";
+                    ctx.translate(75 - Math.floor(Math.random() * 150), 75 - Math.floor(Math.random() * 150));
+                    drawStar(ctx, Math.floor(Math.random() * 4) + 2);
+                    ctx.restore();
+                }
+
+                function drawStar(ctx, r) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(r, 0);
+                    for (var i = 0; i < 9; i++) {
+                        ctx.rotate(Math.PI / 5);
+                        if (i % 2 === 0) {
+                            ctx.lineTo((r / 0.525731) * 0.200811, 0);
+                        } else {
+                            ctx.lineTo(r, 0);
+                        }
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.restore();
+                }
+            </script>
+        </canvas>
+        <hr>
+        <canvas id="canvas5" width="150" height="150" style="border:1px solid #000000;">
+            <script>
+                function clock() {
+                    var now = new Date();
+                    var ctx = document.getElementById("canvas5").getContext("2d");
+                    ctx.save();
+                    ctx.clearRect(0, 0, 150, 150);
+                    ctx.translate(75, 75);
+                    ctx.scale(0.4, 0.4);
+                    ctx.rotate(-Math.PI / 2);
+                    ctx.strokeStyle = "black";
+                    ctx.fillStyle = "white";
+                    ctx.lineWidth = 8;
+                    ctx.lineCap = "round";
+
+                    // Hour marks
+                    ctx.save();
+                    for (var i = 0; i < 12; i++) {
+                        ctx.beginPath();
+                        ctx.rotate(Math.PI / 6);
+                        ctx.moveTo(100, 0);
+                        ctx.lineTo(120, 0);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+
+                    // Minute marks
+                    ctx.save();
+                    ctx.lineWidth = 5;
+                    for (i = 0; i < 60; i++) {
+                        if (i % 5!= 0) {
+                            ctx.beginPath();
+                            ctx.moveTo(117, 0);
+                            ctx.lineTo(120, 0);
+                            ctx.stroke();
+                        }
+                        ctx.rotate(Math.PI / 30);
+                    }
+                    ctx.restore();
+                
+                    var sec = now.getSeconds();
+                    var min = now.getMinutes();
+                    var hr  = now.getHours();
+                    hr = hr >= 12 ? hr - 12 : hr;
+
+                    ctx.fillStyle = "black";
+
+                    // Write the hours
+                    ctx.save();
+                    ctx.rotate(hr * (Math.PI / 6) + (Math.PI / 360) * min + (Math.PI / 21600) *sec);
+                    ctx.lineWidth = 14;
+                    ctx.beginPath();
+                    ctx.moveTo(-20, 0);
+                    ctx.lineTo(80, 0);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Write the minutes
+                    ctx.save();
+                    ctx.rotate((Math.PI / 30) * min + (Math.PI / 1800) * sec);
+                    ctx.lineWidth = 10;
+                    ctx.beginPath();
+                    ctx.moveTo(-28, 0);
+                    ctx.lineTo(112, 0);
+                    ctx.stroke();
+                    ctx.restore();
+                
+                    // Write the seconds
+                    ctx.save();
+                    ctx.rotate(sec * Math.PI / 30);
+                    ctx.strokeStyle = "#D40000";
+                    ctx.fillStyle = "#D40000";
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.moveTo(-30, 0);
+                    ctx.lineTo(83, 0);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 10, 0, Math.PI * 2, true);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(95, 0, 10, 0, Math.PI * 2, true);
+                    ctx.stroke();
+                    ctx.fillStyle = "rgba(0, 0, 0, 0)";
+                    ctx.arc(0, 0, 3, 0, Math.PI * 2, true);
+                    ctx.fill();
+                    ctx.restore();
+
+                    ctx.beginPath();
+                    ctx.lineWidth = 14;
+                    ctx.strokeStyle = "#325FA2";
+                    ctx.arc(0, 0, 142, 0, Math.PI * 2, true);
+                    ctx.stroke();
+
+                    ctx.restore();
+
+                    window.requestAnimationFrame(clock);
+                }
+
+                window.requestAnimationFrame(clock);
+            </script>
+        </canvas>
+        <hr>
+        <canvas id="canvas6" width="150" height="150" style="border:1px solid #000000;">
+            <script>
+                var ctx = document.getElementById("canvas6").getContext("2d");
+                var offset = 0;
+
+                function draw() {
+                    ctx.clearRect(0, 0, canvas3.width, canvas3.height);
+                    ctx.setLineDash([4, 2]);
+                    ctx.lineDashOffset = -offset;
+                    ctx.strokeRect(10, 10, 100, 100);
+                }
+
+                function march() {
+                    offset++;
+                    if (offset > 16) {
+                        offset = 0;
+                    }
+                    draw();
+                    setTimeout(march, 20);
+                }
+
+                march();
+            </script>
+        </canvas>
+        <hr>
+    </body>
+</html>
