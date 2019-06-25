@@ -10,7 +10,7 @@ def index():
 
 @app.route("/demo")
 def demo():
-    return(render_template("demo.html", name = "Demonstration", n = 12))
+    return(render_template("demo.html", name = "Demonstration", n = 11))
 
 @app.route("/anon")
 def anon():
@@ -20,3 +20,7 @@ def anon():
 def get_map():
     growth = get_data.get_growth_table()
     return(render_template("map.html", growth = growth))
+
+@app.route("/pomax")
+def pomax():
+    return(render_template("pomax.html"))
