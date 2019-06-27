@@ -1,0 +1,326 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.6.6/processing.min.js"></script>
+    </head>
+    <body>
+        <h1>Pomax Examples</h1>
+        <hr>
+        <a href="/static/examples.html">(examples)</a>
+        <hr>
+        <script type="application/processing" data-processing-target="canvas1">
+            float framerate = 24;
+            int ball_x;
+            int ball_y;
+            int ball_radius = 20;
+
+            void setup() {
+                size(200, 200);
+                frameRate(framerate);
+                ball_x = width / 2;
+                ball_y = ball_radius;
+                stroke(#333333);
+                fill(#330066);
+            }
+
+            void draw() {
+                float bounce_height = height / 2 * abs(sin(PI * frameCount / framerate));
+                float ball_height = height - (bounce_height + ball_radius);
+                background(#FFFFEE);
+                ball_y = (int) ball_height;
+                ellipse(ball_x, ball_y, ball_radius, ball_radius);
+            }
+        </script>
+        <canvas id="canvas1"></canvas>
+        <script type="application/processing" data-processing-target="canvas2">
+            Bouncer bouncer;
+
+            void setup() {
+                size(200, 200);
+                frameRate(24);
+                stroke(#333333);
+                fill(#330066);
+                bouncer = new Ball(width / 2, 20, 20);
+            }
+
+            void draw() {
+                bouncer.computeNextStep(width, height, frameRate);
+                background(#FFFFEE);
+                bouncer.draw();
+            }
+
+            interface Bouncer {
+                void computeNextStep(int width, int height, float framerate);
+                void draw();
+            }
+
+            class Ball implements Bouncer
+            {
+                int x, y, radius;
+                int step = 0;
+
+                Ball(int x, int y, int r) {
+                    this.x = x;
+                    this.y = y;
+                    this.radius = r;
+                }
+
+                void computeNextStep(int sketch_width, int sketch_height, float frame_rate) {
+                    step++;
+                    float sin_value = abs(sin(PI * step / (float) frame_rate));
+                    float bounce_height = sketch_height / 2 * sin_value;
+                    float ball_height = sketch_height - (bounce_height + radius);
+                    y = (int) ball_height;
+                }
+
+                void draw() {
+                    ellipse(x, y, radius, radius);
+                }
+            }
+        </script>
+        <canvas id="canvas2"></canvas>
+        <script type="application/processing" data-processing-target="canvas3">
+            Bouncer bouncer;
+
+            void setup() {
+                size(200, 200);
+                frameRate(24);
+                stroke(#333333);
+                fill(#330066);
+                bouncer = new Box(width / 2, 20, 20, 20);
+            }
+
+            void draw() {
+                bouncer.computeNextStep(width, height, frameRate);
+                background(#FFFFEE);
+                bouncer.draw();
+            }
+
+            interface Bouncer {
+                void computeNextStep(int width, int height, float framerate);
+                void draw();
+            }
+
+            class Box implements Bouncer
+            {
+                int x, y, w, h;
+                int step = 0;
+
+                Box(int x, int y, int w, int h) {
+                    this.x = x;
+                    this.y = y;
+                    this.w = w;
+                    this.h = h;
+                }
+
+                void computeNextStep(int sketch_width, int sketch_height, float frame_rate) {
+                    step++;
+                    float sin_value = abs(sin(PI * step / (float) frame_rate));
+                    float bounce_height = sketch_height / 2 * sin_value;
+                    float ball_height = sketch_height - (bounce_height + h);
+                    y = (int) ball_height;
+                }
+
+                void draw() {
+                    rect(x, y, w, h);
+                }
+            }
+        </script>
+        <canvas id="canvas3"></canvas>
+        <hr>
+        <script type="application/processing" data-processing-target="canvas4">
+            Bouncer[] bouncer = new Bouncer[3];
+
+            void setup() {
+                size(200, 200);
+                frameRate(24);
+                stroke(#333333);
+                fill(#330066);
+                bouncer[0] = new Ball(width / 3 - 20, 20, 20);
+                bouncer[1] = new Box(width / 2 - 10, 20, 20, 20);
+                bouncer[2] = new Ball((2 * width / 3) + 20, 20, 20);
+            }
+
+            void draw() {
+                for (int b = 0, end = bouncer.length; b < end; b++) {
+                    bouncer[b].computeNextStep(width, height, frameRate);
+                }
+                background(#FFFFEE);
+                for (int b = 0, end = bouncer.length; b < end; b++) {
+                    bouncer[b].draw();
+                }
+            }
+
+            interface Bouncer {
+                void computeNextStep(int width, int height, float framerate);
+                void draw();
+            }
+
+            class Ball implements Bouncer
+            {
+                int x, y, radius;
+                int step = 0;
+
+                Ball(int x, int y, int r) {
+                    this.x = x;
+                    this.y = y;
+                    this.radius = r;
+                }
+
+                void computeNextStep(int sketch_width, int sketch_height, float frame_rate) {
+                    step++;
+                    float sin_value = abs(sin(PI * step / (float) frame_rate));
+                    float bounce_height = sketch_height / 2 * sin_value;
+                    float ball_height = sketch_height - (bounce_height + radius);
+                    y = (int) ball_height;
+                }
+
+                void draw() {
+                    ellipse(x, y, radius, radius);
+                }
+            }
+
+            class Box implements Bouncer
+            {
+                int x, y, w, h;
+                int step = 0;
+
+                Box(int x, int y, int w, int h) {
+                    this.x = x;
+                    this.y = y;
+                    this.w = w;
+                    this.h = h;
+                }
+
+                void computeNextStep(int sketch_width, int sketch_height, float frame_rate) {
+                    step++;
+                    float sin_value = abs(sin(PI * step / (float) frame_rate));
+                    float bounce_height = sketch_height / 2 * sin_value;
+                    float ball_height = sketch_height - (bounce_height + h);
+                    y = (int) ball_height;
+                }
+
+                void draw() {
+                    rect(x, y, w, h);
+                }
+            }
+        </script>
+        <canvas id="canvas4"></canvas>
+        <script type="application/processing" data-processing-target="canvas5">
+            Bouncer[] bouncer = new Bouncer[3];
+
+            void setup() {
+                size(200, 200);
+                frameRate(24);
+                stroke(#333333);
+                fill(#330066);
+
+                bouncer[0] = new Ball(width / 3 - 20, 20, 20);
+                bouncer[1] = new Box(width / 2 - 10, 20, 20, 20);
+                bouncer[2] = new Ball((2 * width / 3) + 20, 20, 20);
+            }
+
+            void draw() {
+                for (int b = 0, end = bouncer.length; b < end; b++) {
+                    bouncer[b].computeNextStep(width, height, frameRate);
+                }
+                background(FFFFEE);
+                for (int b = 0, end = bouncer.length; b < end; b++) {
+                    bouncer[b].draw();
+                }
+            }
+
+            void mousePressed() {
+                for (int b = 0, end = bouncer.length; b < end; b++) {
+                    if (bouncer[b].mouseOver(mouseX, mouseY)) {
+                        bouncer[b].mousePressed();
+                    }
+                }
+            }
+
+            void mouseReleased() {
+                for (int b = 0, end = bouncer.length; b < end; b++) {
+                    bouncer[b].mouseReleased();
+                }
+            }
+
+            void mouseDragged() {
+                for (int b = 0, end = bouncer.length; b < end; b++) {
+                    bouncer[b].mouseDragged(mouseX, mouseY);
+                }
+            }
+
+            abstract class Bouncer
+            {
+                int x, y;
+                boolean canmove = true;
+                int step = 0;
+                int xoffset = 0;
+                int yoffset = 0;
+
+                void computeNextStep(int width, int height, float framerate) {
+                    if (canmove) {
+                        reallyComputeNextStep(width, height, framerate);
+                    }
+                }
+
+                abstract void reallyComputeNextStep(int width, int height, float framerate);
+                abstract void draw();
+                abstract boolean mouseOver(int mx, int my);
+
+                void mousePressed() {
+                    canmove = false;
+                }
+
+                void mouseReleased() {
+                    canmove = true;
+                    x += xoffset;
+                    y += yoffset;
+                    xoffset = 0;
+                    yoffset = 0;
+                }
+
+                void mouseDragged(int mx, int my) {
+                    if (!canmove) {
+                        xoffset = mx - x;
+                        yoffset = my - y;
+                    }
+                }
+            }
+
+            class Ball extends Bouncer
+            {
+                int radius;
+
+                Ball(int x, int y, int r) {
+                    this.x = x;
+                    this.y = y;
+                    this.radius = r;
+                }
+            
+                void reallyComputeNextStep(int sketch_width, int sketch_height, float frame_rate) {
+                    step = (int) ((step + 1) % frame_rate);
+                    float sin_value = abs(sin(PI * step / (float) frame_rate));
+                    float bounce_height = sketch_height / 2 * sin_value;
+                    float ball_height = sketch_height - (bounce_height + radius);
+                    y = (int) ball_height;
+                }
+
+                void draw() {
+                    ellipse(x + xoffset, y + yoffset, radius, radius);
+                }
+
+                boolean mouseOver(int mx, int my) {
+                    return sqrt((x - mx) * (x - mx) + (y - my) * (y - my)) <= radius;
+                }
+            }
+
+            //class Box extends Bouncer
+            //{
+            //
+            //}
+            */
+        </script>
+        <canvas id="canvas5"></canvas>
+        <hr>
+    </body>
+</html>
