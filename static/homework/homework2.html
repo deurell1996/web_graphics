@@ -10,13 +10,13 @@
 
         <script type="application/processing" data-processing-target="my_canvas">
             void setup() {
-                String[] states_csv = loadStrings("state_populations.csv")
+                String[] states_csv = loadStrings("../state_populations.csv")
                 size(900, 600);
                 background(100);
                 stroke(255);
                 Pshape S;
 
-                states = loadShape("us.svg");
+                states = loadShape("../us.svg");
                 states.translate(-125, 0);
                 for (int i = 1; i < states_csv.length(); i++) {
                     String[] data = split(states_csv[i], ',');
