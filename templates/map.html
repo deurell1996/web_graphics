@@ -1,0 +1,42 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/processing.js/1.6.6/processing.min.js"></script>
+    </head>
+    <body>
+        <h1>Processing Map Example</h1>
+        <hr>
+        <a href="/static/examples.html">(examples)</a>
+        <hr>
+        <script type="application/processing" data-processing-target="my_canvas">
+
+        // data from https://www.census.gov/data/tables/time-series/demo/popest/2010s-state-total.html
+        
+        void setup() {
+            size(1000, 600);
+            background(100);
+            stroke(255);
+            // ellipse(50, 50, 25, 25);
+            PShape s;
+            states = loadShape ("static/us.svg");
+            smooth();
+            shape(states,0,0);
+
+            {% for key in growth %}
+                state = "{{ key }}";
+                state_shape = states.getChild(state);
+                state_shape.disableStyle();
+                fill(0,0,{{ growth[key] }} * 8 + 128)
+                shape(state_shape,0,0)
+            {% endfor %}
+        }
+        </script>
+    <canvas id="my_canvas"> </canvas>
+    <hr>
+    <ul>
+    {% for key in growth %}
+        <li>{{ key }} = {{ growth[key] }}</li>
+    {% endfor %}
+    </ul>
+    <hr>
+    </body>
+</html>
