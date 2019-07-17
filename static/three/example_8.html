@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>Example 7: Sky
+		<title>Example 8: Model
 		</title>
 		<style>
 			body { margin: 0; }
@@ -10,6 +10,7 @@
 	<body>
 		<script src="/static/vendor/three.js/build/three.min.js"></script>
 		<script src="/static/vendor/three.js/examples/js/controls/OrbitControls.js"></script>
+		<script src="/static/vendor/three.js/examples/js/loaders/GLTFLoader.js"></script>
 		<script>
 			let scene, camera, renderer, cube;
 
@@ -47,10 +48,29 @@
 				var skyBoxMaterial = new THREE.MeshBasicMaterial( { color: 0xccccff, side: THREE.BackSide } );
 				var skyBox = new THREE.Mesh( skyBoxGeometry, skyBoxMaterial );
 				scene.add(skyBox);
-				scene.fog = new THREE.FogExp2( 0x999999, 0.005 );
+				scene.fog = new THREE.FogExp2( 0x999999, 0.0005 );
+
+				// MODEL
+				var loader = new THREE.GLTFLoader();
+				loader.load( '/static/models/pony_cartoon/scene.gltf', 
+					function ( gltf ) {
+						gltf.scene.scale.set(0.09,0.09,0.09);
+						gltf.scene.translateX(60);
+						scene.add( gltf.scene );
+						othercar = gltf.scene.clone()
+						othercar.translateX(60);
+						scene.add(othercar);
+					}, 
+					undefined, 
+					function ( error ) {
+						console.error( error );
+					} 
+					);
+
+
 
                 // LIGHTS
-				ambientlight = new THREE.AmbientLight(0xffffff, 1.0);
+				ambientlight = new THREE.AmbientLight(0xffffff, 5.0);
 				scene.add(ambientlight);
 
 				redlight = new THREE.PointLight(0xff0000, 8.0, 1);
