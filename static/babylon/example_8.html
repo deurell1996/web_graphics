@@ -3,7 +3,7 @@
 
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <title>Babylon Materials</title>
+        <title>Babylon Animation Dude</title>
 
         <style>
             html, body {
@@ -33,6 +33,7 @@
     <script>
         var canvas = document.getElementById("renderCanvas"); // Get the canvas element 
         var engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+        var camera;
 
         var x = 0;
         var y = 0;
@@ -40,56 +41,52 @@
         var myBox;
 
         /******* Add the create scene function ******/
-        var createScene = function () {
-
-            // Create the scene space
+        var createScene = function (engine) {
             var scene = new BABYLON.Scene(engine);
+            var light = new BABYLON.DirectionalLight("dir01", new BABYLON.Vector3(0, -0.5, -1.0), scene);
+            var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 10, new BABYLON.Vector3(0, 30, 0), scene);
+            camera.setPosition(new BABYLON.Vector3(20, 70, 120));
+            light.position = new BABYLON.Vector3(20, 150, 70);
+            camera.minZ = 10.0;
 
-            // Add a camera to the scene and attach it to the canvas
-            var camera = new BABYLON.ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, new BABYLON.Vector3(0,0,0), scene);
             camera.attachControl(canvas, true);
 
-            // Add lights to the scene
-            var light1 = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(1, 1, 0), scene);
-            var light2 = new BABYLON.PointLight("light2", new BABYLON.Vector3(0, 1, -1), scene);
+            scene.ambientColor = new BABYLON.Color3(0.3, 0.3, 0.3);
 
-            // Add a material for the sphere
-            flatMagenta = new BABYLON.StandardMaterial("flatMagenta", scene);
-            flatMagenta.diffuseColor = new BABYLON.Color3(1, 0, 1);
+            // Ground
+            var ground = BABYLON.Mesh.CreateGround("ground", 1000, 1000, 1, scene, false);
+            var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
+            groundMaterial.diffuseColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+            groundMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+            ground.material = groundMaterial;
+            ground.receiveShadows = true;
 
-            // Add and manipulate meshes in the scene
-            var sphere = BABYLON.MeshBuilder.CreateSphere("sphere", {diameter:2}, scene);
-            sphere.material = flatMagenta;
-            sphere.wireframe = true;
+            // Shadows
+            var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
 
-            // Add a material for the box
-            crateMaterial = new BABYLON.StandardMaterial("crate", scene);
-            crateMaterial.diffuseTexture = new BABYLON.Texture("/static/textures/crate.jpg",scene);  
-            myBox = BABYLON.MeshBuilder.CreateBox("myBox", {height: 5, width: 2, depth: 1}, scene);
-            myBox.material = crateMaterial;
+            // Dude
+            BABYLON.SceneLoader.ImportMesh("him", "/static/scenes/Dude/", "Dude.babylon", scene, function (newMeshes2, particleSystems2, skeletons2) {
+                    var dude = newMeshes2[0];
+                    
+                    for (var index = 0; index < newMeshes2.length; index++) {
+                        shadowGenerator.getShadowMap().renderList.push(newMeshes2[index]);
+                    }
+
+                    dude.rotation.y = Math.PI;
+                    dude.position = new BABYLON.Vector3(0, 0, -80);
+                        
+                    scene.beginAnimation(skeletons2[0], 0, 100, true, 1.0);
+                });
+
             return scene;
         };
+
         /******* End of the create scene function ******/    
 
         var scene = createScene(); //Call the createScene function
 
         // Register a render loop to repeatedly render the scene
         engine.runRenderLoop(function () { 
-            myBox.position.x = x;
-            myBox.position.y = y;
-            myBox.position.z = z;
-            myBox.rotation.x = x;
-            myBox.rotation.y = y;
-            myBox.rotation.z = z;
-            myBox.scaling.x = 1.0 + x;
-            myBox.scaling.y = 1.0 + y;
-            myBox.scaling.z = 1.0 + z;
-            if (x < 10) {
-                x = x + 0.01;
-                y = y + 0.01;
-                z = z + 0.01;
-            }
-
             scene.render();
         });
 
