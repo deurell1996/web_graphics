@@ -1,7 +1,6 @@
 <html>
 	<head>
-		<title>Example 6: Floor
-		</title>
+		<title>Homework 5</title>
 		<style>
 			body { margin: 0; }
 			canvas { width: 100%; height: 100% }
@@ -21,14 +20,44 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				// CRATE
-				var geometry = new THREE.BoxGeometry( 50, 50, 50 );
+
+				// WALL PROPERTIES
+				var geometry1 = new THREE.BoxGeometry( 250, 50, 50 );
+				var geometry2 = new THREE.BoxGeometry( 350, 50, 50 );
+                var geometry3 = new THREE.BoxGeometry(  25, 25, 25 );
 				texture = new THREE.TextureLoader().load("/static/textures/crate.jpg");
 				var material = new THREE.MeshPhongMaterial( { map:texture } );
-				crate = new THREE.Mesh( geometry, material );
-				crate.translateY(25);
-				crate.rotateX(3.4);
-				scene.add( crate );
+
+                // WALL 1 (small 1)
+				wall1 = new THREE.Mesh( geometry1, material );
+				wall1.translateY(25);
+                wall1.translateX(150);
+                wall1.rotateY(Math.PI / 2);
+				scene.add( wall1 );
+
+                // WALL 2 (small 2)
+				wall2 = new THREE.Mesh( geometry1, material );
+				wall2.translateY(25);
+                wall2.translateX(-150);
+                wall2.rotateY(Math.PI / 2);
+				scene.add( wall2 );
+
+                // WALL 2 (large 1)
+                wall3 = new THREE.Mesh( geometry2, material );
+                wall3.translateY(25);
+                wall3.translateZ(150);
+                scene.add( wall3 );
+
+                // WALL 4 (large 2)
+                wall4 = new THREE.Mesh( geometry2, material );
+                wall4.translateY(25);
+                wall4.translateZ(-150);
+                scene.add( wall4 );
+
+                // The "ball" cube
+				ball = new THREE.Mesh( geometry3, material );
+				ball.translateY(25);
+				scene.add( ball );
 
 				// FLOOR
 				var floorTexture = new THREE.TextureLoader().load( '/static/textures/checkerboard.jpg' );
@@ -57,8 +86,8 @@
 				bluelight.position.z = -200;
 				scene.add(bluelight);
 
-				camera.position.y = 50;
-				camera.position.z = 50;
+				camera.position.y = 500;
+				camera.position.z = 300;
 
 				controls = new THREE.OrbitControls(camera, renderer.domElement);
 			}
@@ -72,8 +101,14 @@
 			function animate() {
 				requestAnimationFrame( animate );
 
-				// cube.rotation.x += 0.01;
-				crate.rotation.y += 0.01;
+                if (dir == 1) {
+                    crate.position.x += 0.01;
+                } else if (dir == 2) {
+                    crate.position.y += 0.01
+                }
+
+				//crate.rotation.x += 0.01;
+				//crate.rotation.y += 0.01;
 
 				renderer.render( scene, camera );
 			};
