@@ -65,6 +65,12 @@
                 sun.name = "Sun";
                 sun.translateX(0);
                 scene.add( sun );
+                // The Sun's light
+                sunlight = new THREE.PointLight(0xF38235, 3.0, 0);
+                sunlight.position.x = 0;
+                sunlight.position.y = 0;
+                sunlight.position.z = 0;
+                scene.add(sunlight);
 
                 // Mercury
                 mercuryGeometry = new THREE.SphereGeometry(5, 30, 30);
