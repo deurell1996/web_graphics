@@ -34,6 +34,7 @@
         <script src="/static/vendor/three.js/examples/js/controls/OrbitControls.js"></script>
         <script>
             let scene, camera, renderer;
+            let raycaster, mouse, INTERSECTED;
 
             function setup() {
                 // Scene
@@ -47,16 +48,21 @@
 
                 // Camera
                 camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
-                camera.position.set(500, 0, 500);
+                camera.position.set(1000, 400, 750);
 
                 // Camera controls
 				controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+                // Raycaster
+                raycaster = new THREE.Raycaster();
+                mouse = new THREE.Vector2(), INTERSECTED;
 
                 // Sun
                 sunGeometry = new THREE.SphereGeometry(128, 30, 30);
                 sunTexture = new THREE.TextureLoader().load( '/static/project/assets/sun.jpg' );
                 sunMaterial = new THREE.MeshLambertMaterial( { map: sunTexture } );
                 sun = new THREE.Mesh( sunGeometry, sunMaterial );
+                sun.name = "Sun";
                 sun.translateX(0);
                 scene.add( sun );
 
@@ -65,89 +71,168 @@
                 mercuryTexture = new THREE.TextureLoader().load( '/static/project/assets/mercury.jpg' );
                 mercuryMaterial = new THREE.MeshLambertMaterial( { map: mercuryTexture } );
                 mercury = new THREE.Mesh( mercuryGeometry, mercuryMaterial );
-                mercury.translateX(200);
+                mercury.name = "Mercury";
                 scene.add( mercury );
+                mercury_r = 128 + 50;
+                mercury_theta = 0;
+                mercury_dTheta = 2 * Math.PI / 250;
 
                 // Venus
                 venusGeometry = new THREE.SphereGeometry(10, 50, 50);
                 venusTexture = new THREE.TextureLoader().load( '/static/project/assets/venus_surface.jpg' );
                 venusMaterial = new THREE.MeshLambertMaterial( { map: venusTexture } );
                 venus = new THREE.Mesh( venusGeometry, venusMaterial );
-                venus.translateX(225);
+                venus.name = "Venus"
                 scene.add( venus );
+                venus_r = 128 + 90;
+                venus_theta = 0;
+                venus_dTheta = 2 * Math.PI / 300;
                 // Venus's atmosphere
                 atmosGeometry = new THREE.SphereGeometry(11, 50, 50);
                 atmosTexture = new THREE.TextureLoader().load( '/static/project/assets/venus_atmosphere.jpg' );
                 atmosMaterial = new THREE.MeshLambertMaterial( { map: atmosTexture, transparent: true, opacity: 0.9 } );
                 atmosphere = new THREE.Mesh( atmosGeometry, atmosMaterial );
-                atmosphere.translateX(225);
+                atmosphere.name = "Venus (Atmosphere)"
                 scene.add( atmosphere );
+                atmosphere_r = 128 + 90;
+                atmosphere_theta = 0;
+                atmosphere_dTheta = 2 * Math.PI / 300;
 
                 // Earth
                 earthGeometry = new THREE.SphereGeometry(12, 75, 75);
                 earthTexture = new THREE.TextureLoader().load( '/static/project/assets/earth.jpg' );
                 earthMaterial = new THREE.MeshLambertMaterial( { map: earthTexture } );
                 earth = new THREE.Mesh( earthGeometry, earthMaterial );
-                earth.translateX(255);
-                //earth.rotateZ(-(Math.PI / 16));
+                earth.name = "Earth";
                 scene.add( earth );
+                earth_r = 128 + 130;
+                earth_theta = 0;
+                earth_dTheta = 2 * Math.PI / 325;
                 // Earth's clouds
                 cloudGeometry = new THREE.SphereGeometry(13, 75, 75);
                 cloudTexture = new THREE.TextureLoader().load( '/static/project/assets/earth_clouds.jpg');
                 cloudMaterial = new THREE.MeshLambertMaterial( { map: cloudTexture, transparent: true, opacity: 0.2 } );
                 clouds = new THREE.Mesh( cloudGeometry, cloudMaterial );
-                clouds.translateX(255);
+                clouds.name = "Earth (Clouds)";
                 scene.add( clouds );
+                clouds_r = 128 + 130;
+                clouds_theta = 0;
+                clouds_dTheta = 2 * Math.PI / 325;
 
                 // Mars
                 marsGeometry = new THREE.SphereGeometry(10, 30, 30);
                 marsTexture = new THREE.TextureLoader().load( '/static/project/assets/mars.jpg' );
                 marsMaterial = new THREE.MeshLambertMaterial( { map: marsTexture } );
                 mars = new THREE.Mesh( marsGeometry, marsMaterial );
-                mars.translateX(285);
+                mars.name = "Mars";
                 scene.add( mars );
+                mars_r = 128 + 170;
+                mars_theta = 0;
+                mars_dTheta = 2 * Math.PI / 340;
 
                 // Jupiter
                 jupiterGeometry = new THREE.SphereGeometry(30, 30, 30);
                 jupiterTexture = new THREE.TextureLoader().load( '/static/project/assets/jupiter.jpg' );
                 jupiterMaterial = new THREE.MeshLambertMaterial( { map: jupiterTexture } );
                 jupiter = new THREE.Mesh( jupiterGeometry, jupiterMaterial );
-                jupiter.translateX(330);
+                jupiter.name = "Jupiter";
                 scene.add( jupiter );
+                jupiter_r = 128 + 500;
+                jupiter_theta = 0;
+                jupiter_dTheta = 2 * Math.PI / 680;
 
                 // Saturn
                 saturnGeometry = new THREE.SphereGeometry(20, 30, 30);
                 saturnTexture = new THREE.TextureLoader().load( '/static/project/assets/saturn.jpg' );
                 saturnMaterial = new THREE.MeshLambertMaterial( { map: saturnTexture } );
                 saturn = new THREE.Mesh( saturnGeometry, saturnMaterial );
-                saturn.translateX(400);
+                saturn.name = "Saturn";
                 scene.add( saturn );
+                saturn_r = 128 + 625;
+                saturn_theta = 0;
+                saturn_dTheta = 2 * Math.PI / 750;
                 // Saturn's ring
                 ringGeometry = new THREE.RingGeometry(25, 40, 30);
                 ringTexture = new THREE.TextureLoader().load( '/static/project/assets/saturn_ring.png' )
-                ringMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide } );
-                ringMaterial = new THREE.MeshBasicMaterial( { map: ringTexture, transparent: true, opacity: 0.9 } );
-                ring = new THREE.Mesh(ringGeometry, ringMaterial);
-                ring.translateX(400);
-                ring.rotateX(-(Math.PI / 4));
-                ring.rotateY(Math.PI / 8);
-                scene.add( ring );
+                ringMaterial = new THREE.MeshLambertMaterial( { map: ringTexture, transparent: true, opacity: 0.9, side: THREE.DoubleSide } );
+                rings = new THREE.Mesh(ringGeometry, ringMaterial);
+                rings.name = "Saturn's Rings";
+                rings.rotateX(-(Math.PI / 4));
+                rings.rotateY(Math.PI / 8);
+                scene.add( rings );
+                rings_r = 128 + 625;
+                rings_theta = 0;
+                rings_dTheta = 2 * Math.PI / 750;
 
                 // Uranus
                 uranusGeometry = new THREE.SphereGeometry(18, 30, 30);
                 uranusTexture = new THREE.TextureLoader().load( '/static/project/assets/uranus.jpg' );
                 uranusMaterial = new THREE.MeshLambertMaterial( { map: uranusTexture } );
                 uranus = new THREE.Mesh( uranusGeometry, uranusMaterial );
-                uranus.translateX(450);
+                uranus.name = "Uranus";
                 scene.add( uranus );
+                uranus_r = 128 + 775;
+                uranus_theta = 0;
+                uranus_dTheta = 2 * Math.PI / 900;
 
                 // Neptune
                 neptuneGeometry = new THREE.SphereGeometry(16, 30, 30);
                 neptuneTexture = new THREE.TextureLoader().load( '/static/project/assets/neptune.jpg' );
                 neptuneMaterial = new THREE.MeshLambertMaterial( { map: neptuneTexture } );
                 neptune = new THREE.Mesh( neptuneGeometry, neptuneMaterial );
-                neptune.translateX(490);
+                neptune.name = "Neptune";
                 scene.add( neptune );
+                neptune_r = 128 + 950;
+                neptune_theta = 0;
+                neptune_dTheta = 2 * Math.PI / 1000;
+
+                // Asteroids
+                asteroidGeometry1 = new THREE.SphereGeometry(1, 30, 30);
+                asteroidGeometry2 = new THREE.SphereGeometry(2, 30, 30);
+                asteroidGeometry3 = new THREE.SphereGeometry(3, 30, 30);
+                asteroidGeometry4 = new THREE.SphereGeometry(4, 30, 30);
+                asteroidGeometry5 = new THREE.SphereGeometry(5, 30, 30);
+                asteroidTexture = new THREE.TextureLoader().load( '/static/project/assets/asteroid.jpg' );
+                asteroidMaterial = new THREE.MeshLambertMaterial( { map: asteroidTexture } );
+                asteroid = new THREE.Mesh( asteroidGeometry1, asteroidMaterial );
+                asteroids = [];
+                asteroidCount = 250
+                for (var i = 0; i < asteroidCount; i++) {
+                    newAsteroid = new THREE.Mesh( asteroidGeometry1, asteroidMaterial );
+                    size = Math.floor(Math.random() * 5) + 1;
+                    switch(size) {
+                        case 1:
+                            newAsteroid = new THREE.Mesh( asteroidGeometry1, asteroidMaterial );
+                            break;
+                        case 2:
+                            newAsteroid = new THREE.Mesh( asteroidGeometry2, asteroidMaterial );
+                            break;
+                        case 3:
+                            newAsteroid = new THREE.Mesh( asteroidGeometry3, asteroidMaterial );
+                            break;
+                        case 4:
+                            newAsteroid = new THREE.Mesh( asteroidGeometry4, asteroidMaterial );
+                            break;
+                        case 5:
+                            newAsteroid = new THREE.Mesh( asteroidGeometry5, asteroidMaterial );
+                            break;
+                    }
+                    newAsteroid.rotateX(Math.PI / 2);
+                    asteroids.push(newAsteroid);
+                    scene.add(newAsteroid);
+                }
+
+                asteroid_r = [];
+                for (var i = 0; i < asteroidCount; i++)
+                    asteroid_r.push(128 + 220 + Math.floor(Math.random() * 230) + 1); // 220-450
+
+                asteroid_theta = [];
+                for (var i = 0; i < asteroidCount; i++)
+                    asteroid_theta.push(0);
+
+                asteroid_dTheta = [];
+                for (var i = 0; i < asteroidCount; i++)
+                    asteroid_dTheta.push(2 * Math.PI / (Math.floor(Math.random() * 300) + 201));
 
                 // Ambient light
                 ambientlight = new THREE.AmbientLight(0xffffff, 1.0);
@@ -155,7 +240,7 @@
             }
 
             function resize() {
-                camera.aspect = window.innerWidth/window.innerHeight;
+                camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize( window.innerWidth, window.innerHeight );
             }
@@ -168,27 +253,88 @@
                 sun.rotation.y += 0.005;
                 mercury.rotation.y += 0.005;
                 venus.rotation.y += 0.005;
+                atmosphere.rotation.y += 0.0025;
                 earth.rotation.y += 0.005;
-                clouds.rotation.y += 0.005;
+                clouds.rotation.y += 0.0025;
                 mars.rotation.y += 0.005;
                 jupiter.rotation.y += 0.005;
                 saturn.rotation.y += 0.005;
                 uranus.rotation.y += 0.005;
                 neptune.rotation.y += 0.005;
+                for (var i = 0; i < asteroidCount; i++)
+                    asteroids[i].rotation.y += 0.0005;
+
+                mercury_theta += mercury_dTheta;
+                mercury.position.x = mercury_r * Math.cos(mercury_theta);
+                mercury.position.z = mercury_r * Math.sin(mercury_theta);
+
+                venus_theta += venus_dTheta;
+                venus.position.x = venus_r * Math.cos(venus_theta);
+                venus.position.z = venus_r * Math.sin(venus_theta);
+
+                atmosphere_theta += atmosphere_dTheta;
+                atmosphere.position.x = atmosphere_r * Math.cos(atmosphere_theta);
+                atmosphere.position.z = atmosphere_r * Math.sin(atmosphere_theta);
+
+                earth_theta += earth_dTheta;
+                earth.position.x = earth_r * Math.cos(earth_theta);
+                earth.position.z = earth_r * Math.sin(earth_theta);
+
+                clouds_theta += clouds_dTheta;
+                clouds.position.x = clouds_r * Math.cos(clouds_theta);
+                clouds.position.z = clouds_r * Math.sin(clouds_theta);
+
+                mars_theta += mars_dTheta;
+                mars.position.x = mars_r * Math.cos(mars_theta);
+                mars.position.z = mars_r * Math.sin(mars_theta);
+
+                jupiter_theta += jupiter_dTheta;
+                jupiter.position.x = jupiter_r * Math.cos(jupiter_theta);
+                jupiter.position.z = jupiter_r * Math.sin(jupiter_theta);
+
+                saturn_theta += saturn_dTheta;
+                saturn.position.x = saturn_r * Math.cos(saturn_theta);
+                saturn.position.z = saturn_r * Math.sin(saturn_theta);
+
+                rings_theta += rings_dTheta;
+                rings.position.x = rings_r * Math.cos(rings_theta);
+                rings.position.z = rings_r * Math.sin(rings_theta);
+
+                uranus_theta += uranus_dTheta;
+                uranus.position.x = uranus_r * Math.cos(uranus_theta);
+                uranus.position.z = uranus_r * Math.sin(uranus_theta);
+
+                neptune_theta += neptune_dTheta;
+                neptune.position.x = neptune_r * Math.cos(neptune_theta);
+                neptune.position.z = neptune_r * Math.sin(neptune_theta);
+
+                for (var i = 0; i < asteroids.length; i++) {
+                    asteroid_theta[i] += asteroid_dTheta[i];
+                    asteroids[i].position.x = asteroid_r[i] * Math.cos(asteroid_theta[i]);
+                    asteroids[i].position.z = asteroid_r[i] * Math.sin(asteroid_theta[i]);
+                }
             };
 
             document.addEventListener("keydown", onDocumentKeyDown, false);
             function onDocumentKeyDown(event) {
                 var keyCode = event.which;
-                console.log(keyCode);
                 if (keyCode == 16) {
                     camera.position.y += 10;
                 } else if (keyCode == 17) {
                     camera.position.y -= 10;
                 } else if (keyCode == 32) {
-                    camera.position.set(500, 0, 500);
+                    camera.position.set(1000, 400, 750);
                 }
             }
+
+            function onMouseMove( event ) {
+                event.preventDefault();
+
+                mouse.x = (event.clientX / window.innerWidth) * 2 + 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            }
+
+            window.addEventListener("mousemove", onMouseMove, false)
             window.addEventListener("resize", resize, false);
             setup();
             animate();
