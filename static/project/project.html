@@ -205,29 +205,53 @@
                 asteroids = [];
                 asteroidCount = 250
                 for (var i = 0; i < asteroidCount; i++) {
-                    newAsteroid = new THREE.Mesh( asteroidGeometry1, asteroidMaterial );
-                    size = Math.floor(Math.random() * 5) + 1;
-                    switch(size) {
+                    // Random asteroid size
+                    var asteroidSize;
+                    sizeNum = Math.floor(Math.random() * 5) + 1;
+                    switch (sizeNum) {
                         case 1:
-                            newAsteroid = new THREE.Mesh( asteroidGeometry1, asteroidMaterial );
+                            asteroidSize = asteroidGeometry1;
                             break;
                         case 2:
-                            newAsteroid = new THREE.Mesh( asteroidGeometry2, asteroidMaterial );
+                            asteroidSize = asteroidGeometry2;
                             break;
                         case 3:
-                            newAsteroid = new THREE.Mesh( asteroidGeometry3, asteroidMaterial );
+                            asteroidSize = asteroidGeometry3;
                             break;
                         case 4:
-                            newAsteroid = new THREE.Mesh( asteroidGeometry4, asteroidMaterial );
+                            asteroidSize = asteroidGeometry4;
                             break;
                         case 5:
-                            newAsteroid = new THREE.Mesh( asteroidGeometry5, asteroidMaterial );
+                            asteroidSize = asteroidGeometry5;
                             break;
                     }
+
+                    // Random asteroid texture
+                    var asteroidMaterial
+                    textureNum = Math.floor(Math.random() * 5) + 1;
+                    switch (textureNum) {
+                        case 1:
+                            asteroidMaterial = asteroidMaterial1;
+                            break;
+                        case 2:
+                            asteroidMaterial = asteroidMaterial2;
+                            break;
+                        case 3:
+                            asteroidMaterial = asteroidMaterial3;
+                            break;
+                        case 4:
+                            asteroidMaterial = asteroidMaterial4;
+                            break;
+                        case 5:
+                            asteroidMaterial = asteroidMaterial5;
+                            break;
+                    }
+
                     offset = Math.floor(Math.random() * 32) + 1;
                     upOrDown = Math.floor(Math.random() * 2) + 1;
                     if (upOrDown == 2) offset = -offset;
 
+                    newAsteroid = new THREE.Mesh( asteroidSize, asteroidMaterial );
                     newAsteroid.translateY(offset);
                     asteroids.push(newAsteroid);
                     scene.add(newAsteroid);
