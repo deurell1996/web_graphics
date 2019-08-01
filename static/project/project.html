@@ -1,6 +1,6 @@
 <html>
     <head>
-        <!-- Textures from: https://www.solarsystemscope.com/textures/ -->
+        <!-- Planetary Textures from: https://www.solarsystemscope.com/textures/ -->
         <title>Project: Solar System</title>
         <style>
             body { margin: 0; }
@@ -8,17 +8,18 @@
         </style>
     </head>
     <body>
+        <!-- The Controls to be displayed at the top left -->
         <div id="HUD">Controls
-            <p>Change View:     Mouse      </p>
-            <p>Move Forward:    Front Arrow</p>
-            <p>Move Backward:   Back  Arrow</p>
-            <p>Move Left:       Left  Arrow</p>
-            <p>Move Right:      Right Arrow</p>
-            <p>Move Up:         Shift      </p>
-            <p>Move Down:       Ctrl       </p>
-            <p>Reset Camera:    Space      </p>
-            <p>Toggle Lighting: Backspace  </p>
-            <p>Stop Animation:  Enter      </p>
+            <p>Change View:       Mouse      </p>
+            <p>Move Forward:      Front Arrow</p>
+            <p>Move Backward:     Back  Arrow</p>
+            <p>Move Left:         Left  Arrow</p>
+            <p>Move Right:        Right Arrow</p>
+            <p>Move Up:           Shift      </p>
+            <p>Move Down:         Ctrl       </p>
+            <p>Reset Camera:      Space      </p>
+            <p>Toggle All-Bright: Backspace  </p>
+            <p>Toggle Animation:  Enter      </p>
         </div>
         <style>
             #HUD {
@@ -47,12 +48,12 @@
                 // Renderer
                 renderer = new THREE.WebGLRenderer();
                 renderer.setSize( window.innerWidth, window.innerHeight );
-                renderer.autoClear = false;
+                renderer.autoClear = false; // Necessary to render two scenes together
                 document.body.appendChild( renderer.domElement );
 
                 // Camera
                 camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 10000 );
-                camera.position.set(1000, 400, 750);
+                camera.position.set(1000, 400, 750); // Default camera position
 
                 // Camera controls
 				controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -62,7 +63,6 @@
                 sunTexture = new THREE.TextureLoader().load( '/static/project/assets/sun.jpg' );
                 sunMaterial = new THREE.MeshLambertMaterial( { map: sunTexture } );
                 sun = new THREE.Mesh( sunGeometry, sunMaterial );
-                sun.name = "Sun";
                 scene2.add( sun );
                 // Sun - Second texture
                 sun2Geometry = new THREE.SphereGeometry(128, 30, 30);
@@ -70,7 +70,7 @@
                 sun2Material = new THREE.MeshLambertMaterial( { map: sun2Texture, transparent: true, opacity: 0.5 } );
                 sun2 = new THREE.Mesh( sun2Geometry, sun2Material );
                 scene2.add( sun2 );
-                // The Sun's light
+                // Sunlight
                 sunlight = new THREE.PointLight(0xF38235, 3.0, 0);
                 sunlight.position.x = 0;
                 sunlight.position.y = 0;
@@ -82,7 +82,6 @@
                 mercuryTexture = new THREE.TextureLoader().load( '/static/project/assets/mercury.jpg' );
                 mercuryMaterial = new THREE.MeshLambertMaterial( { map: mercuryTexture } );
                 mercury = new THREE.Mesh( mercuryGeometry, mercuryMaterial );
-                mercury.name = "Mercury";
                 scene.add( mercury );
                 mercury_r = 128 + 50;
                 mercury_theta = 0;
@@ -93,7 +92,6 @@
                 venusTexture = new THREE.TextureLoader().load( '/static/project/assets/venus_surface.jpg' );
                 venusMaterial = new THREE.MeshLambertMaterial( { map: venusTexture } );
                 venus = new THREE.Mesh( venusGeometry, venusMaterial );
-                venus.name = "Venus"
                 scene.add( venus );
                 venus_r = 128 + 90;
                 venus_theta = 0;
@@ -103,7 +101,6 @@
                 atmosTexture = new THREE.TextureLoader().load( '/static/project/assets/venus_atmosphere.jpg' );
                 atmosMaterial = new THREE.MeshLambertMaterial( { map: atmosTexture, transparent: true, opacity: 0.9 } );
                 atmosphere = new THREE.Mesh( atmosGeometry, atmosMaterial );
-                atmosphere.name = "Venus (Atmosphere)"
                 scene.add( atmosphere );
                 atmosphere_r = 128 + 90;
                 atmosphere_theta = 0;
@@ -114,7 +111,6 @@
                 earthTexture = new THREE.TextureLoader().load( '/static/project/assets/earth.jpg' );
                 earthMaterial = new THREE.MeshLambertMaterial( { map: earthTexture } );
                 earth = new THREE.Mesh( earthGeometry, earthMaterial );
-                earth.name = "Earth";
                 scene.add( earth );
                 earth_r = 128 + 130;
                 earth_theta = 0;
@@ -124,7 +120,6 @@
                 cloudTexture = new THREE.TextureLoader().load( '/static/project/assets/earth_clouds.jpg');
                 cloudMaterial = new THREE.MeshLambertMaterial( { map: cloudTexture, transparent: true, opacity: 0.2 } );
                 clouds = new THREE.Mesh( cloudGeometry, cloudMaterial );
-                clouds.name = "Earth (Clouds)";
                 scene.add( clouds );
                 clouds_r = 128 + 130;
                 clouds_theta = 0;
@@ -135,7 +130,6 @@
                 marsTexture = new THREE.TextureLoader().load( '/static/project/assets/mars.jpg' );
                 marsMaterial = new THREE.MeshLambertMaterial( { map: marsTexture } );
                 mars = new THREE.Mesh( marsGeometry, marsMaterial );
-                mars.name = "Mars";
                 scene.add( mars );
                 mars_r = 128 + 170;
                 mars_theta = 0;
@@ -146,7 +140,6 @@
                 jupiterTexture = new THREE.TextureLoader().load( '/static/project/assets/jupiter.jpg' );
                 jupiterMaterial = new THREE.MeshLambertMaterial( { map: jupiterTexture } );
                 jupiter = new THREE.Mesh( jupiterGeometry, jupiterMaterial );
-                jupiter.name = "Jupiter";
                 scene.add( jupiter );
                 jupiter_r = 128 + 500;
                 jupiter_theta = 0;
@@ -157,7 +150,6 @@
                 saturnTexture = new THREE.TextureLoader().load( '/static/project/assets/saturn.jpg' );
                 saturnMaterial = new THREE.MeshLambertMaterial( { map: saturnTexture } );
                 saturn = new THREE.Mesh( saturnGeometry, saturnMaterial );
-                saturn.name = "Saturn";
                 scene.add( saturn );
                 saturn_r = 128 + 625;
                 saturn_theta = 0;
@@ -167,7 +159,6 @@
                 ringTexture = new THREE.TextureLoader().load( '/static/project/assets/saturn_ring.png' )
                 ringMaterial = new THREE.MeshLambertMaterial( { map: ringTexture, transparent: true, opacity: 0.9, side: THREE.DoubleSide } );
                 rings = new THREE.Mesh(ringGeometry, ringMaterial);
-                rings.name = "Saturn's Rings";
                 rings.rotateX(-(Math.PI / 4));
                 rings.rotateY(Math.PI / 8);
                 scene.add( rings );
@@ -180,7 +171,6 @@
                 uranusTexture = new THREE.TextureLoader().load( '/static/project/assets/uranus.jpg' );
                 uranusMaterial = new THREE.MeshLambertMaterial( { map: uranusTexture } );
                 uranus = new THREE.Mesh( uranusGeometry, uranusMaterial );
-                uranus.name = "Uranus";
                 scene.add( uranus );
                 uranus_r = 128 + 775;
                 uranus_theta = 0;
@@ -191,7 +181,6 @@
                 neptuneTexture = new THREE.TextureLoader().load( '/static/project/assets/neptune.jpg' );
                 neptuneMaterial = new THREE.MeshLambertMaterial( { map: neptuneTexture } );
                 neptune = new THREE.Mesh( neptuneGeometry, neptuneMaterial );
-                neptune.name = "Neptune";
                 scene.add( neptune );
                 neptune_r = 128 + 950;
                 neptune_theta = 0;
@@ -258,10 +247,12 @@
                             break;
                     }
 
+                    // Vertical offset
                     offset = Math.floor(Math.random() * 32) + 1;
                     upOrDown = Math.floor(Math.random() * 2) + 1;
                     if (upOrDown == 2) offset = -offset;
 
+                    // Add the new asteroid
                     newAsteroid = new THREE.Mesh( asteroidSize, asteroidMaterial );
                     newAsteroid.translateY(offset);
                     asteroidBelt.push(newAsteroid);
@@ -325,16 +316,19 @@
                             asteroidMaterial = asteroidMaterial5;
                             break;
                     }
+                    // Vertical offset
                     offset = Math.floor(Math.random() * 128) + 1;
                     upOrDown = Math.floor(Math.random() * 2) + 1;
                     if (upOrDown == 2) offset = -offset;
 
+                    // Add the new asteroid
                     newAsteroid = new THREE.Mesh( asteroidSize, asteroidMaterial );
                     newAsteroid.translateY(offset);
                     asteroids.push(newAsteroid);
                     scene.add(newAsteroid);
                 }
 
+                // Stray asteroid revolutions
                 asteroids_r = [];
                 for (var i = 0; i < asteroidCount; i++)
                     asteroids_r.push(128 + 25 + Math.floor(Math.random() * 975) + 1);
@@ -357,14 +351,16 @@
                 scene2.add(ambientlight2);
             }
 
+            // Adjust the camera for window resizes
             function resize() {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
                 renderer.setSize( window.innerWidth, window.innerHeight );
             }
 
+            // Animate the scenes
             function animate() {
-                id = requestAnimationFrame( animate );
+                requestAnimationFrame( animate );
                 renderer.render( scene, camera );
                 renderer.render( scene2, camera );
 
@@ -385,6 +381,8 @@
                     asteroidBelt[i].rotation.y += Math.floor(Math.random(100) + 1) / 1000;
                 for (var i = 0; i < asteroidCount; i++)
                     asteroids[i].rotation.y += Math.floor(Math.random(100) + 1) / 1000;
+
+                // Start calculating revolutions
 
                 mercury_theta += mercury_dTheta;
                 mercury.position.x = mercury_r * Math.cos(mercury_theta);
@@ -443,25 +441,33 @@
                 }
             };
 
+            // Keyboard inputs
             document.addEventListener("keydown", onDocumentKeyDown, false);
             function onDocumentKeyDown(event) {
                 var keyCode = event.which;
-                if (keyCode == 16) {
+                // Move the camera up
+                if (keyCode == 16) { // Shift
                     camera.position.y += 15;
-                } else if (keyCode == 17) {
+                // Move the camera down
+                } else if (keyCode == 17) { // Ctrl
                     camera.position.y -= 15;
-                } else if (keyCode == 32) {
+                // Reset the camera
+                } else if (keyCode == 32) { // Space
                     camera.position.set(1000, 400, 750);
                     controls.center.set(0, 0, 0);
                     controls.update();
-                } else if (keyCode == 8) {
+                // Toggle all-bright
+                } else if (keyCode == 8) { // Backspace
                     if (ambientlight1.intensity == 0.0) {
                         ambientlight1.intensity = 1.0;
                     }
                     else {
                         ambientlight1.intensity = 0.0;
                     }
-                } else if (keyCode == 13) {
+                // Start/Stop animations
+                } else if (keyCode == 13) { // Enter
+                    // If not stopped
+                    // Save the original dThetas and set them to 0
                     if (! stoppedAnimation) {
                         mercury_saved_dTheta = mercury_dTheta;
                         mercury_dTheta = 0;
@@ -510,6 +516,7 @@
 
                         stoppedAnimation = true;
                     }
+                    // If the animation is stopped, restore the dTheta values
                     else {
                         mercury_dTheta = mercury_saved_dTheta;
                         venus_dTheta = venus_saved_dTheta;
