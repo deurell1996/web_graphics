@@ -9,14 +9,16 @@
     </head>
     <body>
         <div id="HUD">Controls
-            <p>Change View:   Left Mouse + Drag </p>
-            <p>Move Forward:  Front Arrow       </p>
-            <p>Move Backward: Back  Arrow       </p>
-            <p>Move Left:     Left  Arrow       </p>
-            <p>Move Right:    Right Arrow       </p>
-            <p>Move Up:       Shift             </p>
-            <p>Move Down:     Ctrl              </p>
-            <p>Reset Camera:  Space             </p>
+            <p>Change View:     Mouse      </p>
+            <p>Move Forward:    Front Arrow</p>
+            <p>Move Backward:   Back  Arrow</p>
+            <p>Move Left:       Left  Arrow</p>
+            <p>Move Right:      Right Arrow</p>
+            <p>Move Up:         Shift      </p>
+            <p>Move Down:       Ctrl       </p>
+            <p>Reset Camera:    Space      </p>
+            <p>Toggle Lighting: Backspace  </p>
+            <p>Stop Animation:  Enter      </p>
         </div>
         <style>
             #HUD {
@@ -34,16 +36,18 @@
         <script src="/static/vendor/three.js/examples/js/controls/OrbitControls.js"></script>
         <script>
             let scene, camera, renderer;
-            let raycaster, mouse, INTERSECTED;
+            let stoppedAnimation = false;
 
             function setup() {
                 // Scene
                 scene = new THREE.Scene();
                 scene.background = new THREE.ImageUtils.loadTexture("/static/project/assets/2k_stars.jpg");
+                scene2 = new THREE.Scene();
 
                 // Renderer
                 renderer = new THREE.WebGLRenderer();
                 renderer.setSize( window.innerWidth, window.innerHeight );
+                renderer.autoClear = false;
                 document.body.appendChild( renderer.domElement );
 
                 // Camera
@@ -53,18 +57,19 @@
                 // Camera controls
 				controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-                // Raycaster
-                raycaster = new THREE.Raycaster();
-                mouse = new THREE.Vector2(), INTERSECTED;
-
                 // Sun
                 sunGeometry = new THREE.SphereGeometry(128, 30, 30);
                 sunTexture = new THREE.TextureLoader().load( '/static/project/assets/sun.jpg' );
                 sunMaterial = new THREE.MeshLambertMaterial( { map: sunTexture } );
                 sun = new THREE.Mesh( sunGeometry, sunMaterial );
                 sun.name = "Sun";
-                sun.translateX(0);
-                scene.add( sun );
+                scene2.add( sun );
+                // Sun - Second texture
+                sun2Geometry = new THREE.SphereGeometry(128, 30, 30);
+                sun2Texture = new THREE.TextureLoader().load( '/static/project/assets/sun_dark.jpg' );
+                sun2Material = new THREE.MeshLambertMaterial( { map: sun2Texture, transparent: true, opacity: 0.5 } );
+                sun2 = new THREE.Mesh( sun2Geometry, sun2Material );
+                scene2.add( sun2 );
                 // The Sun's light
                 sunlight = new THREE.PointLight(0xF38235, 3.0, 0);
                 sunlight.position.x = 0;
@@ -192,7 +197,7 @@
                 neptune_theta = 0;
                 neptune_dTheta = 2 * Math.PI / 1000;
 
-                // Asteroids
+                // Asteroid Belt
                 asteroidGeometry1 = new THREE.SphereGeometry(1, 30, 30);
                 asteroidGeometry2 = new THREE.SphereGeometry(2, 30, 30);
                 asteroidGeometry3 = new THREE.SphereGeometry(3, 30, 30);
@@ -208,9 +213,9 @@
                 asteroidMaterial3 = new THREE.MeshLambertMaterial( { map: asteroidTexture3 } );
                 asteroidMaterial4 = new THREE.MeshLambertMaterial( { map: asteroidTexture4 } );
                 asteroidMaterial5 = new THREE.MeshLambertMaterial( { map: asteroidTexture5 } );
-                asteroids = [];
-                asteroidCount = 250
-                for (var i = 0; i < asteroidCount; i++) {
+                asteroidBelt = [];
+                asteroidBeltCount = 750;
+                for (var i = 0; i < asteroidBeltCount; i++) {
                     // Random asteroid size
                     var asteroidSize;
                     sizeNum = Math.floor(Math.random() * 5) + 1;
@@ -259,25 +264,97 @@
 
                     newAsteroid = new THREE.Mesh( asteroidSize, asteroidMaterial );
                     newAsteroid.translateY(offset);
+                    asteroidBelt.push(newAsteroid);
+                    scene.add(newAsteroid);
+                }
+
+                // Asteroid Belt Revolutions
+                asteroidBelt_r = [];
+                for (var i = 0; i < asteroidBeltCount; i++)
+                    asteroidBelt_r.push(128 + 230 + Math.floor(Math.random() * 160) + 1);
+                asteroidBelt_theta = [];
+                for (var i = 0; i < asteroidBeltCount; i++)
+                    asteroidBelt_theta.push(0);
+                asteroidBelt_dTheta = [];
+                for (var i = 0; i < asteroidBeltCount; i++)
+                    asteroidBelt_dTheta.push(2 * Math.PI / (Math.floor(Math.random() * 300) + 201));
+                // Adjust the initial positions of the asteroids
+                for (var i = 0; i < asteroidBeltCount; i++) {
+                    asteroidBelt_theta[i] += asteroidBelt_theta[i] + (Math.floor(Math.random() * 100) + 1)
+                }
+
+                // Stray asteroids
+                strayGeometry1 = new THREE.SphereGeometry(0.5, 30, 30);
+                strayGeometry2 = new THREE.SphereGeometry(1, 30, 30);
+                strayGeometry3 = new THREE.SphereGeometry(1.5, 30, 30);
+                asteroids = [];
+                asteroidCount = 250;
+                for (var i = 0; i < asteroidCount; i++) {
+                    // Random asteroid size
+                    var asteroidSize;
+                    sizeNum = Math.floor(Math.random() * 3) + 1;
+                    switch (sizeNum) {
+                        case 1:
+                            asteroidSize = strayGeometry1;
+                            break;
+                        case 2:
+                            asteroidSize = strayGeometry2;
+                            break;
+                        case 3:
+                            asteroidSize = strayGeometry3;
+                            break;
+                    }
+
+                    // Random asteroid texture
+                    var asteroidMaterial
+                    textureNum = Math.floor(Math.random() * 5) + 1;
+                    switch (textureNum) {
+                        case 1:
+                            asteroidMaterial = asteroidMaterial1;
+                            break;
+                        case 2:
+                            asteroidMaterial = asteroidMaterial2;
+                            break;
+                        case 3:
+                            asteroidMaterial = asteroidMaterial3;
+                            break;
+                        case 4:
+                            asteroidMaterial = asteroidMaterial4;
+                            break;
+                        case 5:
+                            asteroidMaterial = asteroidMaterial5;
+                            break;
+                    }
+                    offset = Math.floor(Math.random() * 128) + 1;
+                    upOrDown = Math.floor(Math.random() * 2) + 1;
+                    if (upOrDown == 2) offset = -offset;
+
+                    newAsteroid = new THREE.Mesh( asteroidSize, asteroidMaterial );
+                    newAsteroid.translateY(offset);
                     asteroids.push(newAsteroid);
                     scene.add(newAsteroid);
                 }
 
-                asteroid_r = [];
+                asteroids_r = [];
                 for (var i = 0; i < asteroidCount; i++)
-                    asteroid_r.push(128 + 230 + Math.floor(Math.random() * 210) + 1); // 230-440
-
-                asteroid_theta = [];
+                    asteroids_r.push(128 + 25 + Math.floor(Math.random() * 975) + 1);
+                asteroids_theta = [];
                 for (var i = 0; i < asteroidCount; i++)
-                    asteroid_theta.push(0);
-
-                asteroid_dTheta = [];
+                    asteroids_theta.push(0);
+                asteroids_dTheta = [];
                 for (var i = 0; i < asteroidCount; i++)
-                    asteroid_dTheta.push(2 * Math.PI / (Math.floor(Math.random() * 300) + 201));
+                    asteroids_dTheta.push(2 * Math.PI / (Math.floor(Math.random() * 300) + 201));
+                // Adjust the initial positions of the asteroids
+                for (var i = 0; i < asteroidCount; i++) {
+                    asteroids_theta[i] += asteroids_theta[i] + (Math.floor(Math.random() * 100) + 1);
+                }
 
-                // Ambient light
-                ambientlight = new THREE.AmbientLight(0xffffff, 1.0);
-                scene.add(ambientlight);
+                // Ambient light for the primary scene
+                ambientlight1 = new THREE.AmbientLight(0xffffff, 0.0);
+                scene.add(ambientlight1);
+                // Ambient light for the sun
+                ambientlight2 = new THREE.AmbientLight(0xffffff, 1.0);
+                scene2.add(ambientlight2);
             }
 
             function resize() {
@@ -287,11 +364,13 @@
             }
 
             function animate() {
-                requestAnimationFrame( animate );
+                id = requestAnimationFrame( animate );
                 renderer.render( scene, camera );
+                renderer.render( scene2, camera );
 
                 // Celestial rotations
-                sun.rotation.y += 0.005;
+                sun.rotation.y += 0.0005;
+                sun2.rotation.y += 0.0005;
                 mercury.rotation.y += 0.005;
                 venus.rotation.y += 0.005;
                 atmosphere.rotation.y += 0.0025;
@@ -302,8 +381,10 @@
                 saturn.rotation.y += 0.005;
                 uranus.rotation.y += 0.005;
                 neptune.rotation.y += 0.005;
+                for (var i = 0; i < asteroidBeltCount; i++)
+                    asteroidBelt[i].rotation.y += Math.floor(Math.random(100) + 1) / 1000;
                 for (var i = 0; i < asteroidCount; i++)
-                    asteroids[i].rotation.y += 0.0005;
+                    asteroids[i].rotation.y += Math.floor(Math.random(100) + 1) / 1000;
 
                 mercury_theta += mercury_dTheta;
                 mercury.position.x = mercury_r * Math.cos(mercury_theta);
@@ -349,10 +430,16 @@
                 neptune.position.x = neptune_r * Math.cos(neptune_theta);
                 neptune.position.z = neptune_r * Math.sin(neptune_theta);
 
+                for (var i = 0; i < asteroidBelt.length; i++) {
+                    asteroidBelt_theta[i] += asteroidBelt_dTheta[i];
+                    asteroidBelt[i].position.x = asteroidBelt_r[i] * Math.cos(asteroidBelt_theta[i]);
+                    asteroidBelt[i].position.z = asteroidBelt_r[i] * Math.sin(asteroidBelt_theta[i]);
+                }
+
                 for (var i = 0; i < asteroids.length; i++) {
-                    asteroid_theta[i] += asteroid_dTheta[i];
-                    asteroids[i].position.x = asteroid_r[i] * Math.cos(asteroid_theta[i]);
-                    asteroids[i].position.z = asteroid_r[i] * Math.sin(asteroid_theta[i]);
+                    asteroids_theta[i] += asteroids_dTheta[i];
+                    asteroids[i].position.x = asteroids_r[i] * Math.cos(asteroids_theta[i]);
+                    asteroids[i].position.z = asteroids_r[i] * Math.sin(asteroids_theta[i]);
                 }
             };
 
@@ -360,22 +447,95 @@
             function onDocumentKeyDown(event) {
                 var keyCode = event.which;
                 if (keyCode == 16) {
-                    camera.position.y += 10;
+                    camera.position.y += 15;
                 } else if (keyCode == 17) {
-                    camera.position.y -= 10;
+                    camera.position.y -= 15;
                 } else if (keyCode == 32) {
                     camera.position.set(1000, 400, 750);
+                    controls.center.set(0, 0, 0);
+                    controls.update();
+                } else if (keyCode == 8) {
+                    if (ambientlight1.intensity == 0.0) {
+                        ambientlight1.intensity = 1.0;
+                    }
+                    else {
+                        ambientlight1.intensity = 0.0;
+                    }
+                } else if (keyCode == 13) {
+                    if (! stoppedAnimation) {
+                        mercury_saved_dTheta = mercury_dTheta;
+                        mercury_dTheta = 0;
+
+                        venus_saved_dTheta = venus_dTheta;
+                        venus_dTheta = 0;
+
+                        atmosphere_saved_dTheta = atmosphere_dTheta;
+                        atmosphere_dTheta = 0;
+
+                        earth_saved_dTheta = earth_dTheta;
+                        earth_dTheta = 0;
+
+                        clouds_saved_dTheta = clouds_dTheta;
+                        clouds_dTheta = 0;
+
+                        mars_saved_dTheta = mars_dTheta;
+                        mars_dTheta = 0;
+
+                        jupiter_saved_dTheta = jupiter_dTheta;
+                        jupiter_dTheta = 0;
+
+                        saturn_saved_dTheta = saturn_dTheta;
+                        saturn_dTheta = 0;
+
+                        rings_saved_dTheta = rings_dTheta;
+                        rings_dTheta = 0;
+
+                        uranus_saved_dTheta = uranus_dTheta;
+                        uranus_dTheta = 0;
+
+                        neptune_saved_dTheta = neptune_dTheta;
+                        neptune_dTheta = 0;
+
+                        asteroidBelt_saved_dTheta = [];
+                        for (var i =0; i < asteroidBelt.length; i++) {
+                            asteroidBelt_saved_dTheta.push(asteroidBelt_dTheta[i]);
+                            asteroidBelt_dTheta[i] = 0;
+                        }
+
+                        asteroids_saved_dTheta = [];
+                        for (var i = 0; i < asteroids.length; i++) {
+                            asteroids_saved_dTheta.push(asteroids_dTheta[i]);
+                            asteroids_dTheta[i] = 0;
+                        }
+
+                        stoppedAnimation = true;
+                    }
+                    else {
+                        mercury_dTheta = mercury_saved_dTheta;
+                        venus_dTheta = venus_saved_dTheta;
+                        atmosphere_dTheta = atmosphere_saved_dTheta;
+                        earth_dTheta = earth_saved_dTheta;
+                        clouds_dTheta = clouds_saved_dTheta;
+                        mars_dTheta = mars_saved_dTheta;
+                        jupiter_dTheta = jupiter_saved_dTheta;
+                        saturn_dTheta = saturn_saved_dTheta;
+                        rings_dTheta = rings_saved_dTheta;
+                        uranus_dTheta = uranus_saved_dTheta;
+                        neptune_dTheta = neptune_saved_dTheta;
+
+                        for (var i = 0; i < asteroidBelt.length; i++) {
+                            asteroidBelt_dTheta[i] = asteroidBelt_saved_dTheta[i];
+                        }
+
+                        for (var i = 0; i < asteroids.length; i++) {
+                            asteroids_dTheta[i] = asteroids_saved_dTheta[i];
+                        }
+
+                        stoppedAnimation = false;
+                    }
                 }
             }
 
-            function onMouseMove( event ) {
-                event.preventDefault();
-
-                mouse.x = (event.clientX / window.innerWidth) * 2 + 1;
-                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            }
-
-            window.addEventListener("mousemove", onMouseMove, false)
             window.addEventListener("resize", resize, false);
             setup();
             animate();
