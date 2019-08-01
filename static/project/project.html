@@ -217,14 +217,18 @@
                             newAsteroid = new THREE.Mesh( asteroidGeometry5, asteroidMaterial );
                             break;
                     }
-                    newAsteroid.rotateX(Math.PI / 2);
+                    offset = Math.floor(Math.random() * 32) + 1;
+                    upOrDown = Math.floor(Math.random() * 2) + 1;
+                    if (upOrDown == 2) offset = -offset;
+
+                    newAsteroid.translateY(offset);
                     asteroids.push(newAsteroid);
                     scene.add(newAsteroid);
                 }
 
                 asteroid_r = [];
                 for (var i = 0; i < asteroidCount; i++)
-                    asteroid_r.push(128 + 220 + Math.floor(Math.random() * 230) + 1); // 220-450
+                    asteroid_r.push(128 + 230 + Math.floor(Math.random() * 210) + 1); // 230-440
 
                 asteroid_theta = [];
                 for (var i = 0; i < asteroidCount; i++)
